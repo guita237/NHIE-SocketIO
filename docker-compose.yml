@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:14
+    container_name: nhie-db
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nhie-backend
+    restart: always
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - "3500:3500"
+    volumes:
+      - ./backend/NHIE_Questions.txt:/app/NHIE_Questions.txt
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nhie-frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "8081:80"
+
+volumes:
+  postgres_data:

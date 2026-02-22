@@ -1,0 +1,44 @@
+name: Deploy NHIE app to Hetzner
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository (optional, mostly for info)
+        uses: actions/checkout@v4
+
+      - name: Start SSH agent and add key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy on Hetzner
+        run: |
+          ssh deploy@${{ secrets.SERVER_IP }} << 'EOF'
+            set -e
+
+            echo "Changing to project directory"
+            cd /var/www/nhie-app/NHIE  
+
+            echo "Fetching latest code "
+            git fetch origin
+            git reset --hard origin/main  
+
+            echo "Stopping existing containers"
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml down || true
+
+            echo "Building and restarting in detached mode"
+            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+
+            echo "Deployment completed"
+          EOF

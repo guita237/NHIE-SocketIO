@@ -1,0 +1,9 @@
+# docker-compose.prod.yml
+services:
+  backend:
+    expose:
+      - "3500"
+
+  frontend:
+    ports:
+      - "8081:80"

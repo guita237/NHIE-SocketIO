@@ -1,0 +1,8 @@
+node_modules/
+dist
+.idea
+.DS_Store
+.vscode
+.env
+/backend/yarn.lock
+/frontend/yarn.lock

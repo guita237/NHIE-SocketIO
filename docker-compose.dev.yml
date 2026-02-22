@@ -1,0 +1,16 @@
+# docker-compose.dev.yml
+services:
+  db:
+    # in dev mode we can expose the database to the host for easier access with tools like pgAdmin
+    ports:
+      - "5432:5432"
+
+  backend:
+    # exposer l’API sur ton host
+    ports:
+      - "3500:3500"
+
+  frontend:
+    # exposer le front  http://localhost:8081
+    ports:
+      - "8081:80"
